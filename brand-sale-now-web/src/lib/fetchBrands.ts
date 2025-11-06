@@ -4,7 +4,7 @@ import { getPool } from "./db";
 export async function fetchBrands(): Promise<DbResult> {
   try {
     const pool = getPool();
-    const [rows] = await pool.query("SELECT * from brands");
+    const [rows] = await pool.query("SELECT * from brands order by name asc");
 
     return {
       success: true,

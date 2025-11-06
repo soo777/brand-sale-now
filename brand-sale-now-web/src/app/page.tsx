@@ -19,7 +19,7 @@ export default async function Home() {
   }
 
   return (
-    <div className="flex min-h-screen">
+    <div className="flex min-h-screen bg-[#f5f5f5]">
       <div className="w-full flex items-center justify-center p-4">
         <div className="max-w-4xl w-full">
           {!result.success && (
@@ -34,7 +34,7 @@ export default async function Home() {
 
           {/* 브랜드 리스트(카드) */}
           {result.success && result.data && (
-            <div>
+            <div className="max-w-[1080px] mx-auto flex flex-wrap gap-4 justify-center">
               {(result.data as Brand[]).map((brand) => (
                 <BrandCard key={brand.id} brand={brand as Brand} />
               ))}
