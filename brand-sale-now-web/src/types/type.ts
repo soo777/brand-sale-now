@@ -3,8 +3,18 @@ export type Brand = {
   country: string;
   description: string;
   id: number;
-  instagram_url: string;
-  logo_url: string;
+  instagramUrl: string;
+  logoUrl: string;
   name: string;
-  official_url: string;
+  officialUrl: string;
+  sales: Sale[];
+};
+
+export type Sale = {
+  saleId: number;
+  saleType: string;
+  saleDescription: string;
+  saleStartDate: string;
+  saleEndDate: string;
+  isActive: boolean;
 };

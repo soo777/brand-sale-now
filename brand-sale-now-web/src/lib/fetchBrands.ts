@@ -4,7 +4,32 @@ import { getPool } from "./db";
 export async function fetchBrands(): Promise<DbResult> {
   try {
     const pool = getPool();
-    const [rows] = await pool.query("SELECT * from brands order by name asc");
+    // const [rows] = await pool.query("SELECT * from brands order by name asc");
+    const [rows] = await pool.query(`
+      SELECT
+        b.name AS name,
+        b.official_url AS officialUrl,
+        b.logo_url AS logoUrl,
+        b.instagram_url as instagramUrl,
+        b.description,
+        COALESCE(
+          JSON_ARRAYAGG(
+            JSON_OBJECT(
+              'saleId', s.id,
+              'saleType', s.sale_type,
+              'saleDescription', s.sale_description,
+              'saleStartDate', s.sale_start_date,
+              'saleEndDate', s.sale_end_date,
+              'isActive', s.is_active
+            )
+          ), JSON_ARRAY()
+        ) AS sales
+      FROM brands AS b
+      LEFT JOIN sales AS s
+        ON b.id = s.brand_id
+      GROUP BY b.id, b.name, b.country, b.official_url, b.logo_url
+      ORDER BY b.name ASC;
+      `);
 
     return {
       success: true,

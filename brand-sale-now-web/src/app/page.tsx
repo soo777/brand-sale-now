@@ -36,7 +36,7 @@ export default async function Home() {
           {result.success && result.data && (
             <div className="max-w-[1080px] mx-auto flex flex-wrap gap-4 justify-center">
               {(result.data as Brand[]).map((brand) => (
-                <BrandCard key={brand.id} brand={brand as Brand} />
+                <BrandCard key={brand.name + brand.id} brand={brand as Brand} />
               ))}
             </div>
           )}
