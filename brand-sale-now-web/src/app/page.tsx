@@ -1,7 +1,7 @@
 import { fetchBrands } from "@/lib/fetchBrands";
 import { DbResult } from "@/types/db";
 import { Brand } from "@/types/type";
-import BrandCard from "./components/BrandCard";
+import { HomeComponent } from "./components/HomeComponent";
 
 export default async function Home() {
   let result: DbResult;
@@ -18,30 +18,17 @@ export default async function Home() {
     };
   }
 
-  return (
-    <div className="flex min-h-screen bg-[#f5f5f5]">
-      <div className="w-full flex items-center justify-center p-4">
-        <div className="max-w-4xl w-full">
-          {!result.success && (
-            <div className="mt-4">
-              <p className="text-red-600 font-semibold">에러:</p>
-              <p className="text-sm text-red-700">{result.error}</p>
-              {result.details && (
-                <p className="text-xs text-red-600 mt-1">{result.details}</p>
-              )}
-            </div>
-          )}
+  const brands =
+    result.success && Array.isArray(result.data)
+      ? (result.data as Brand[])
+      : [];
 
-          {/* 브랜드 리스트(카드) */}
-          {result.success && result.data && (
-            <div className="max-w-[1080px] mx-auto flex flex-wrap gap-4 justify-center">
-              {(result.data as Brand[]).map((brand) => (
-                <BrandCard key={brand.name + brand.id} brand={brand as Brand} />
-              ))}
-            </div>
-          )}
-        </div>
-      </div>
-    </div>
-  );
+  const error = result.success
+    ? undefined
+    : {
+        message: result.error ?? "데이터 조회에 실패했습니다.",
+        details: result.details,
+      };
+
+  return <HomeComponent brands={brands} error={error} />;
 }
