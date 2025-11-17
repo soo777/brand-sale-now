@@ -3,8 +3,9 @@
 
 import { useState } from "react";
 import BrandCard from "./BrandCard";
-import { Brand } from "@/types/type";
+import { Brand, Sale } from "@/types/type";
 import SaleCalendar from "./SaleCalendar";
+import { Button } from "@/components/ui/button";
 
 type HomeComponentProps = {
   brands: Brand[];
@@ -16,6 +17,13 @@ type HomeComponentProps = {
 
 export function HomeComponent({ brands, error }: HomeComponentProps) {
   const [view, setView] = useState<"brands" | "calendar">("brands");
+  const [sales, setSales] = useState<Sale[]>([]);
+
+  const getSales = async () => {
+    const response = await fetch("/api/sales");
+    const data = await response.json();
+    setSales(data.data);
+  };
 
   return (
     <div className="flex min-h-screen bg-[#f5f5f5]">
@@ -33,8 +41,7 @@ export function HomeComponent({ brands, error }: HomeComponentProps) {
           )}
 
           <div className="flex justify-center items-center gap-4 mb-4">
-            <button
-              type="button"
+            <Button
               onClick={() => setView("brands")}
               className={`rounded-md px-4 py-2 text-sm font-semibold transition-colors ${
                 view === "brands"
@@ -43,10 +50,12 @@ export function HomeComponent({ brands, error }: HomeComponentProps) {
               }`}
             >
               Brands
-            </button>
-            <button
-              type="button"
-              onClick={() => setView("calendar")}
+            </Button>
+            <Button
+              onClick={async () => {
+                await getSales();
+                setView("calendar");
+              }}
               className={`rounded-md px-4 py-2 text-sm font-semibold transition-colors ${
                 view === "calendar"
                   ? "bg-black text-white"
@@ -54,7 +63,7 @@ export function HomeComponent({ brands, error }: HomeComponentProps) {
               }`}
             >
               Calendar
-            </button>
+            </Button>
           </div>
 
           {view === "brands" ? (
@@ -71,7 +80,7 @@ export function HomeComponent({ brands, error }: HomeComponentProps) {
             )
           ) : (
             <div className="rounded-md border border-dashed border-gray-300 bg-white p-12 text-center text-sm text-gray-500">
-              <SaleCalendar sales={[]} />
+              <SaleCalendar sales={sales as Sale[]} />
             </div>
           )}
         </div>
