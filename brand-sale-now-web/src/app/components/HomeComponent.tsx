@@ -1,4 +1,3 @@
-// src/app/components/HomeContent.tsx
 "use client";
 
 import { useState } from "react";
@@ -15,6 +14,9 @@ type HomeComponentProps = {
   };
 };
 
+/**
+ * HomeComponent
+ */
 export function HomeComponent({ brands, error }: HomeComponentProps) {
   const [view, setView] = useState<"brands" | "calendar">("brands");
   const [sales, setSales] = useState<Sale[]>([]);

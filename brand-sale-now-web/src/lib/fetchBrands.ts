@@ -7,6 +7,7 @@ export async function fetchBrands(): Promise<DbResult> {
     // const [rows] = await pool.query("SELECT * from brands order by name asc");
     const [rows] = await pool.query(`
       SELECT
+        b.id AS id,
         b.name AS name,
         b.official_url AS officialUrl,
         b.logo_url AS logoUrl,

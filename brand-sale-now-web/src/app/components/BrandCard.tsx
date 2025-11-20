@@ -14,6 +14,7 @@ export default function BrandCard({ brand }: { brand: Brand }) {
 
   const handleAlertDialogOpen = (open: boolean) => {
     setOpen(open);
+    console.log(brand);
   };
 
   return (
@@ -66,7 +67,7 @@ export default function BrandCard({ brand }: { brand: Brand }) {
       <SaleDialog
         open={open}
         onOpenChange={handleAlertDialogOpen}
-        brand={brand}
+        brandId={brand.id}
       />
     </>
   );
