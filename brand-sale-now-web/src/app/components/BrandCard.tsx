@@ -1,4 +1,5 @@
 "use client";
+
 import { Brand } from "@/types/type";
 import { Home } from "lucide-react";
 import Image from "next/image";

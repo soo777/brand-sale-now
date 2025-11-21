@@ -1,4 +1,5 @@
 "use client";
+
 import { Sale } from "@/types/type";
 import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";

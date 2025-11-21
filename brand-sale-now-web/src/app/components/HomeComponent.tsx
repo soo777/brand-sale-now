@@ -1,10 +1,12 @@
 "use client";
 
 import { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import BrandCard from "./BrandCard";
 import { Brand, Sale } from "@/types/type";
 import SaleCalendar from "./SaleCalendar";
 import { Button } from "@/components/ui/button";
+import { fetchSales } from "@/lib/api/sales";
 
 type HomeComponentProps = {
   brands: Brand[];
@@ -19,13 +21,18 @@ type HomeComponentProps = {
  */
 export function HomeComponent({ brands, error }: HomeComponentProps) {
   const [view, setView] = useState<"brands" | "calendar">("brands");
-  const [sales, setSales] = useState<Sale[]>([]);
+  const {
+    data: salesData,
+    isLoading: isLoadingSales,
+    error: salesError,
+  } = useQuery({
+    queryKey: ["sales"],
+    queryFn: fetchSales,
+    enabled: view === "calendar", // calendar 뷰일 때만 데이터 가져오기
+    staleTime: 60 * 1000, // 1분간 캐시 유지
+  });
 
-  const getSales = async () => {
-    const response = await fetch("/api/sales");
-    const data = await response.json();
-    setSales(data.data);
-  };
+  const sales = salesData?.data || [];
 
   return (
     <div className="flex min-h-screen bg-[#f5f5f5]">
@@ -54,10 +61,7 @@ export function HomeComponent({ brands, error }: HomeComponentProps) {
               Brands
             </Button>
             <Button
-              onClick={async () => {
-                await getSales();
-                setView("calendar");
-              }}
+              onClick={() => setView("calendar")}
               className={`rounded-md px-4 py-2 text-sm font-semibold transition-colors ${
                 view === "calendar"
                   ? "bg-black text-white"
@@ -82,7 +86,15 @@ export function HomeComponent({ brands, error }: HomeComponentProps) {
             )
           ) : (
             <div className="rounded-md border border-dashed border-gray-300 bg-white p-12 text-center text-sm text-gray-500">
-              <SaleCalendar sales={sales as Sale[]} />
+              {isLoadingSales ? (
+                <p>세일 정보를 불러오는 중...</p>
+              ) : salesError ? (
+                <p className="text-red-500">
+                  세일 정보를 불러오는데 실패했습니다.
+                </p>
+              ) : (
+                <SaleCalendar sales={sales as Sale[]} />
+              )}
             </div>
           )}
         </div>

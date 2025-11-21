@@ -1,4 +1,5 @@
 "use client";
+
 import {
   Dialog,
   DialogContent,
@@ -8,9 +9,9 @@ import {
   DialogTitle,
   DialogClose,
 } from "@/components/ui/dialog";
-import { Sale } from "@/types/type";
 import dayjs from "dayjs";
-import { useEffect, useState, useRef } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { fetchSaleByBrandId } from "@/lib/api/sales";
 
 type SaleDialogProps = {
   open: boolean;
@@ -22,31 +23,18 @@ type SaleDialogProps = {
  * 세일 팝업 컴포넌트
  */
 export function SaleDialog({ open, onOpenChange, brandId }: SaleDialogProps) {
-  const [saleInfo, setSaleInfo] = useState<Sale[]>([]);
-  const [loading, setLoading] = useState(false);
-  const prevOpenRef = useRef(false);
+  const {
+    data: saleData,
+    isLoading: loading,
+    error: saleError,
+  } = useQuery({
+    queryKey: ["sale", brandId],
+    queryFn: () => fetchSaleByBrandId(brandId!),
+    enabled: open && !!brandId, // 다이얼로그가 열려있고 brandId가 있을 때만 실행
+    staleTime: 60 * 1000, // 1분간 캐시 유지
+  });
 
-  useEffect(() => {
-    // open이 false에서 true로 변경될 때만 API 호출 (다이얼로그가 열릴 때마다)
-    if (open && !prevOpenRef.current && brandId) {
-      setLoading(true);
-      const fetchSaleInfo = async () => {
-        try {
-          const response = await fetch(`/api/sales/${brandId}`);
-          const data = await response.json();
-          if (data.ok && data.data) {
-            setSaleInfo(data.data);
-          }
-        } catch (error) {
-          console.error("Error fetching sale info:", error);
-        } finally {
-          setLoading(false);
-        }
-      };
-      fetchSaleInfo();
-    }
-    prevOpenRef.current = open;
-  }, [open, brandId]);
+  const saleInfo = saleData?.data || [];
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -57,7 +45,11 @@ export function SaleDialog({ open, onOpenChange, brandId }: SaleDialogProps) {
             <div>
               {loading ? (
                 <p>세일 정보를 불러오는 중...</p>
-              ) : (
+              ) : saleError ? (
+                <p className="text-red-500">
+                  세일 정보를 불러오는데 실패했습니다.
+                </p>
+              ) : saleInfo.length > 0 ? (
                 <>
                   <p>{saleInfo[0]?.saleDescription}</p>
                   <p className="mt-5">
@@ -66,6 +58,8 @@ export function SaleDialog({ open, onOpenChange, brandId }: SaleDialogProps) {
                     {dayjs(saleInfo[0]?.saleEndDate).format("YYYY-MM-DD")}
                   </p>
                 </>
+              ) : (
+                <p>세일 정보가 없습니다.</p>
               )}
             </div>
           </DialogDescription>
